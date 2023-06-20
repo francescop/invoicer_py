@@ -1,0 +1,15 @@
+---
+customer_name: John Doe
+customer_address1: 123 Main St
+customer_address2: Apt 4B
+customer_business_number: ABC123
+invoice_number: 1
+invoice_currency: eur
+invoice_date: 19/06/2023
+invoice_items:
+  - description: Item 1
+    quantity: 2
+    unit_price: 10
+  - description: Item 2
+    quantity: 1
+    unit_price: 5

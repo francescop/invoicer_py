@@ -1,0 +1,15 @@
+---
+output_directory: /tmp/
+invoice_header:
+  - Your company
+  - address1
+  - ZIP City - State
+  - Tel. +41 000 000 000
+  - Web. yoursite.com
+  - Mail. mail@yoursite.com
+  - business_no
+  - other lines...
+invoice_footer:
+  - "eur: IT00 0000 0000 0000 0000 00"
+  - "chf: CH00 0000 0000 0000 0000 0"
+
