@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import yaml
+import textwrap
 import argparse
 import os, sys, datetime
 from typing import List
@@ -18,6 +19,8 @@ class Settings(BaseModel):
     # list of strings
     invoice_header: List[str]
     invoice_footer: List[str]
+    # payment instructions
+    payment_instructions: dict
 
 SETTINGS_FILE = "~/.config/invoicer.yml"
 
@@ -31,7 +34,7 @@ settings = None
 # - total price
 class InvoiceItem(BaseModel):
     description: str
-    quantity: int
+    quantity: float
     unit_price: float
 
 # struct for invoice, it contains:
@@ -226,14 +229,15 @@ def output_pdf(invoice: Invoice, settings: Settings) -> None:
     # Write the invoice items to the PDF
     items_data = [['Description', 'Quantity', 'Unit Price', 'Total Price']]
     for item in invoice.invoice_items:
-        description = item.description
+        # multiline description, do not use Paragraph(item.description, styles["Normal"])
+        description = textwrap.fill(item.description, 40)
         quantity = item.quantity
         unit_price = item.unit_price
         total_price = item.unit_price * item.quantity
         items_data.append([description, quantity, unit_price, total_price])
 
     # add the total price to the invoice and the currency
-    items_data.append(['Tot:', '', '', f"{calculate_total_price(invoice)} {invoice.invoice_currency}"])
+    items_data.append([f"Tot ({invoice.invoice_currency}):", '', '', f"{calculate_total_price(invoice)} {invoice.invoice_currency}"])
 
     items_table = Table(items_data, colWidths=[250, 90, 100, 100], repeatRows=1)
     items_table.setStyle(TableStyle([
@@ -252,6 +256,31 @@ def output_pdf(invoice: Invoice, settings: Settings) -> None:
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
     ]))
     elements.append(items_table)
+
+    # spacer
+    elements.append(Spacer(1, 12))
+
+    # payment details
+    # payment_instructions:
+    #   eur: IT00 0000 0000 0000 0000 00
+    #   chf: CH00 0000 0000 0000 0000 0
+
+    payment_data = []
+
+    # get the payment instructions for the invoice currency
+    payment_instructions = settings.payment_instructions[invoice.invoice_currency.lower()]
+    payment_data.append([payment_instructions])
+
+    payment_table = Table(payment_data, colWidths=[550])
+    payment_table.setStyle(TableStyle([
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+        ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, -1), 5),
+    ]))
+    elements.append(payment_table)
 
     # spacer
     elements.append(Spacer(1, 12))
