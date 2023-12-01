@@ -2,6 +2,11 @@
 
 This is a Python script that generates and prints invoices in PDF format based on provided templates and configuration settings.
 
+## Features
+
+- no databases, just files
+- multi currency support
+
 ## Prerequisites
 
 - Python 3.x
@@ -25,6 +30,9 @@ invoice_header:
 invoice_footer:
   - Footer line 1
   - Footer line 2
+payment_instructions:
+  eur: IT00 0000 0000 0000 0000 00
+  chf: CH00 0000 0000 0000 0000 0
 ```
 
 Make sure to replace `/path/to/output/directory` with the desired directory path where the generated PDF invoices should be saved. Additionally, you can customize the invoice header and footer lines.
